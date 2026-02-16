@@ -1,0 +1,13 @@
+{
+  "name": "pos-seed-generator",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Generates realistic POS seed data for the MongoDB MCP Workshop",
+  "main": "generate.js",
+  "scripts": {
+    "generate": "node generate.js"
+  },
+  "dependencies": {
+    "@faker-js/faker": "^9.0.0"
+  }
+}

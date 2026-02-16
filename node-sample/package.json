@@ -1,0 +1,15 @@
+{
+  "name": "pos-api",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Sample POS API with intentionally unoptimized queries for the MongoDB MCP Workshop",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "dev": "node --watch app.js"
+  },
+  "dependencies": {
+    "express": "^4.21.0",
+    "mongodb": "^6.12.0"
+  }
+}
