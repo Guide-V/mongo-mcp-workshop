@@ -13,17 +13,26 @@ stages via MCP.
 **Prompt:**
 
 ```
-Calculate the total revenue per store per day for the last 30 days.
-Sort by date descending, then by revenue descending.
+Using the aggregate tool on the orders collection in the pos database:
+Calculate the total revenue per store per day.
 Only include orders with status "completed".
+Group by storeId and the date portion of createdAt (truncated to day).
+Sum the "total" field for revenue.
+Sort by date descending, then by revenue descending.
+Limit to 20 results.
 ```
 
 **Expected MCP tool:** `aggregate` on `orders`
 
 **Expected pipeline stages:**
-1. `$match` – status: "completed", createdAt in last 30 days
-2. `$group` – by storeId + date (truncated to day), sum of `total`
+1. `$match` – status: "completed"
+2. `$group` – by storeId + date (use `$dateTrunc` on createdAt), `$sum: "$total"`
 3. `$sort` – date desc, revenue desc
+4. `$limit` – 20
+
+> **Note:** The order revenue field is `total` (not `amount` or `revenue`).
+> About 5% of orders use `total_amount` instead — this is intentional
+> schema drift that you will investigate in Lab 04.
 
 **Discussion point:** Does this pipeline use the index we created in Lab 02?
 Ask the LLM to explain it if you're unsure.
@@ -35,8 +44,12 @@ Ask the LLM to explain it if you're unsure.
 **Prompt:**
 
 ```
+Using the aggregate tool on the orders collection in the pos database:
 Find the top 10 products by total revenue across all stores.
-Show the product name, total quantity sold, and total revenue.
+Each order has an "items" array where each item has productId, name,
+quantity, unitPrice, and subtotal.
+Unwind the items, group by productId, sum the quantity and subtotal.
+Show product name, total quantity sold, and total revenue.
 ```
 
 **Expected pipeline stages:**
@@ -81,12 +94,14 @@ Show how many customers fall into each bucket.
 **Prompt:**
 
 ```
+Using the aggregate tool on the orders collection in the pos database:
 Compare all 5 stores on these metrics for the year 2025:
-- Total revenue
+- Total revenue (the field is called "total")
 - Average order value
 - Total number of orders
 - Number of unique customers
 
+Filter createdAt between ISODate("2025-01-01") and ISODate("2026-01-01").
 Sort by total revenue descending.
 ```
 
@@ -115,8 +130,10 @@ debit_card, and mobile_pay.
 **Prompt:**
 
 ```
-Create a MongoDB view called "store_daily_revenue" based on the
-aggregation from Exercise 1.
+Create a MongoDB view called "store_daily_revenue" in the pos database.
+It should aggregate the orders collection: match status "completed",
+group by storeId and dateTrunc of createdAt to day, sum the "total" field
+as totalRevenue, and sort by date descending then revenue descending.
 ```
 
 > **Note:** The MCP server may or may not support `createCollection` with a

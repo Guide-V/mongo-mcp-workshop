@@ -215,7 +215,7 @@ function generateOrders(count, stores, products, customers) {
       items: items,
       paymentMethod: pick(PAYMENT_METHODS),
       status: pick(ORDER_STATUSES),
-      createdAt: randomDate("2024-06-01", "2025-12-31"),
+      createdAt: randomDate(new Date(Date.now() - 30 * 86400000).toISOString(), new Date().toISOString()),
     };
 
     // Schema drift: ~5% use "total_amount" instead of "total"

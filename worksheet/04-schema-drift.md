@@ -94,24 +94,25 @@ Show me 3 orders that are missing customerId.
 **Prompt:**
 
 ```
-I want to fix the schema drift in the orders collection:
-1. Rename "total_amount" to "total" for all affected orders
-2. For orders missing customerId, set it to "UNKNOWN"
+For the orders collection in the pos database, I need two updateMany
+operations to standardize the schema:
 
-What MongoDB update operations would accomplish this?
-Don't execute yet – just show me the commands.
+1. Use $rename to change "total_amount" to "total" where total_amount exists.
+2. Use $set to add customerId: "UNKNOWN" where customerId does not exist.
+
+Please explain what each operation does and how many documents each would affect.
 ```
 
-**Expected response:** The LLM should propose two `updateMany` operations:
+**Expected response:** The LLM should describe two `updateMany` operations:
 
 ```javascript
-// Fix 1: Rename total_amount → total
+// Standardize field name: total_amount → total
 db.orders.updateMany(
   { total_amount: { $exists: true } },
   { $rename: { "total_amount": "total" } }
 )
 
-// Fix 2: Set missing customerId
+// Backfill missing customerId
 db.orders.updateMany(
   { customerId: { $exists: false } },
   { $set: { customerId: "UNKNOWN" } }
@@ -120,31 +121,33 @@ db.orders.updateMany(
 
 ---
 
-## Exercise 5 – Execute the fix
+## Exercise 5 – Apply the updates
 
 **Prompt:**
 
 ```
-Go ahead and execute both fixes on the orders collection.
+Run both updateMany operations on the orders collection in the pos database:
+1. Rename total_amount to total where total_amount exists.
+2. Set customerId to "UNKNOWN" where customerId does not exist.
 ```
-
+**NOTE: The LLM might have already applied the updatedMany from Exercise 4**
 **Expected MCP tool:** `updateMany` (×2)
 
 **Expected results:**
-- Fix 1: ~2,500 documents modified
-- Fix 2: ~1,500 documents modified
+- Update 1: ~2,500 documents modified
+- Update 2: ~1,500 documents modified
 
 ---
 
-## Exercise 6 – Verify the fix
+## Exercise 6 – Verify the results
 
 **Prompt:**
 
 ```
-Verify the fix:
-1. Are there any orders still using total_amount?
-2. Are there any orders still missing customerId?
-3. Show me the updated schema of the orders collection.
+Check the orders collection in the pos database:
+1. Count orders that still have a total_amount field.
+2. Count orders where customerId does not exist.
+3. Show the current schema of the orders collection.
 ```
 
 **Expected results:**
