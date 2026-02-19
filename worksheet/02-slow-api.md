@@ -35,7 +35,7 @@ intentionally missing indexes. In this lab you will:
 Run this in your terminal and note the response time:
 
 ```bash
-time curl -s "http://localhost:4000/api/orders?storeId=S0001&from=2025-01-01&to=2025-06-30" | head -c 200
+time curl -s "http://localhost:4000/api/orders?storeId=S0001&from=2026-01-01&to=2026-06-30" | head -c 200
 ```
 
 > This should take noticeably longer than expected for returning just 50
@@ -54,8 +54,8 @@ docker exec mcp-mongodb mongosh --quiet pos --eval '
 db.orders.explain("executionStats").find({
   storeId: "S0001",
   createdAt: {
-    $gte: ISODate("2025-01-01T00:00:00Z"),
-    $lte: ISODate("2025-06-30T23:59:59Z")
+    $gte: ISODate("2026-01-01T00:00:00Z"),
+    $lte: ISODate("2026-06-30T23:59:59Z")
   }
 }).sort({ createdAt: -1 })
 '
@@ -68,9 +68,10 @@ db.orders.explain("executionStats").find({
 ```
 Use the explain tool on database "pos", collection "orders".
 The method name is "find" and the arguments are:
-  filter: { storeId: "S0001", createdAt: { $gte: ISODate("2025-01-01"), $lte: ISODate("2025-06-30") } }
-  sort: { createdAt: -1 }
+filter: { storeId: "S0001", createdAt: { $gte: ISODate("2026-01-01"), $lte: ISODate("2026-06-30") } }
+sort: { createdAt: -1 }
 Use executionStats verbosity.
+The method array should have an object with a name field set to find and an arguments field with the filter and sort.
 Tell me if it's using an index or doing a collection scan.
 ```
 
@@ -140,8 +141,8 @@ docker exec mcp-mongodb mongosh --quiet pos --eval '
 db.orders.explain("executionStats").find({
   storeId: "S0001",
   createdAt: {
-    $gte: ISODate("2025-01-01T00:00:00Z"),
-    $lte: ISODate("2025-06-30T23:59:59Z")
+    $gte: ISODate("2026-01-01T00:00:00Z"),
+    $lte: ISODate("2026-06-30T23:59:59Z")
   }
 }).sort({ createdAt: -1 })
 '
@@ -154,9 +155,10 @@ db.orders.explain("executionStats").find({
 ```
 Run the explain tool again on database "pos", collection "orders".
 Method name is "find", arguments:
-  filter: { storeId: "S0001", createdAt: { $gte: ISODate("2025-01-01"), $lte: ISODate("2025-06-30") } }
+  filter: { storeId: "S0001", createdAt: { $gte: ISODate("2026-01-01"), $lte: ISODate("2026-06-30") } }
   sort: { createdAt: -1 }
 Use executionStats verbosity.
+The method array should have an object with a name field set to find and an arguments field with the filter and sort.
 Is it using the new index now? Compare with the previous COLLSCAN result.
 ```
 
@@ -172,7 +174,7 @@ Is it using the new index now? Compare with the previous COLLSCAN result.
 Now re-run the API call and compare response times:
 
 ```bash
-time curl -s "http://localhost:4000/api/orders?storeId=S0001&from=2025-01-01&to=2025-06-30" | head -c 200
+time curl -s "http://localhost:4000/api/orders?storeId=S0001&from=2026-01-01&to=2026-06-30" | head -c 200
 ```
 
 ---
